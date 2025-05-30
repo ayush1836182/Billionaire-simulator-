@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Billion Dollar Simulator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f);
+            color: #fff;
+            line-height: 1.5;
+            min-height: 100vh;
+            padding: 10px;
+            overflow-x: hidden;
+            touch-action: manipulation;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Header Styles */
+        header {
+            background: rgba(30, 30, 50, 0.9);
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 2px solid #ffd700;
+        }
+        
+        .profile {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        
+        .profile-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ffd700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        .profile-info h2 {
+            color: #ffd700;
+            font-size: 1.2rem;
+        }
+        
+        .profile-info p {
+            color: #ecf0f1;
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .wallet {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid #2ecc71;
+        }
+        
+        #money-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2ecc71;
+            margin-bottom: 3px;
+        }
+        
+        #total-spent {
+            color: #ffd700;
+            font-size: 0.9rem;
+        }
+        
+        /* Categories */
+        .categories {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding: 12px 10px;
+            background: rgba(20, 20, 40, 0.9);
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        
+        .categories::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .category-btn {
+            padding: 8px 12px;
+            background: linear-gradient(to right, #3498db, #9b59b6);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .category-btn.active {
+            background: linear-gradient(to right, #ffd700, #ff8c00);
+            color: #000;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+        }
+        
+        /* Items Grid */
+        .category-content {
+            padding: 12px;
+            display: none;
+        }
+        
+        .category-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .items-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        
+        .item-card {
+            background: linear-gradient(145deg, #2c3e50, #1a1a2e);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .item-img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-bottom: 2px solid #ffd700;
+        }
+        
+        .item-info {
+            padding: 12px;
+        }
+        
+        .item-title {
+            font-size: 0.95rem;
+            margin-bottom: 6px;
+            color: #ffd700;
+            min-height: 30px;
+        }
+        
+        .item-price {
+            font-weight: bold;
+            color: #2ecc71;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        
+        .item-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+            padding: 3px;
+        }
+        
+        .quantity-btn {
+            width: 26px;
+            height: 26px;
+            border: none;
+            background: #3498db;
+            border-radius: 50%;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .quantity-input {
+            width: 30px;
+            text-align: center;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        .buy-btn {
+            padding: 6px 12px;
+            background: linear-gradient(to right, #2ecc71, #1abc9c);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            font-size: 0.85rem;
+        }
+        
+        /* Purchase History */
+        #purchase-history {
+            background: rgba(26, 26, 46, 0.9);
+            padding: 12px;
+            border-top: 2px solid #ffd700;
+        }
+        
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .history-header h2 {
+            color: #ffd700;
+            font-size: 1.1rem;
+        }
+        
+        #clear-history {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+        
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 5px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .history-item {
+            background: rgba(44, 62, 80, 0.7);
+            border-radius: 8px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            border-left: 3px solid #2ecc71;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-15px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .history-item img {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            object-fit: cover;
+            margin-right: 8px;
+            border: 1px solid #ffd700;
+        }
+        
+        .history-details {
+            flex: 1;
+        }
+        
+        .history-details h3 {
+            color: #ffd700;
+            margin-bottom: 2px;
+            font-size: 0.85rem;
+        }
+        
+        .history-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #ecf0f1;
+            font-size: 0.75rem;
+        }
+        
+        .history-cost {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+        
+        .empty-history {
+            text-align: center;
+            padding: 15px;
+            color: rgba(255, 255, 255, 0.7);
+            font-style: italic;
+        }
+        
+        .empty-history i {
+            font-size: 1.8rem;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 8px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 12px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.75rem;
+            background: rgba(20, 20, 40, 0.9);
+        }
+        
+        .gold-text {
+            color: #ffd700;
+            margin-top: 3px;
+            display: block;
+        }
+        
+        /* Animations */
+        .money-change {
+            position: fixed;
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 1.1rem;
+            pointer-events: none;
+            z-index: 100;
+            animation: moneyFloat 1.5s forwards;
+            text-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
+        }
+        
+        @keyframes moneyFloat {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-60px) scale(1.2); }
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background-color: #ffd700;
+            animation: confettiFall 2s linear forwards;
+            z-index: 90;
+            border-radius: 50%;
+        }
+        
+        @keyframes confettiFall {
+            to { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%) translateX(200%);
+            background: linear-gradient(to right, #2c3e50, #1a1a2e);
+            color: #ffd700;
+            padding: 10px 15px;
+            border-radius: 8px;
+            transition: transform 0.4s ease;
+            z-index: 1000;
+            border: 2px solid #ffd700;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.5);
+            max-width: 90%;
+            font-size: 0.9rem;
+            text-align: center;
+            width: 90%;
+        }
+        
+        .notification.show {
+            transform: translateX(-50%) translateX(0);
+        }
+        
+        .notification i {
+            margin-right: 6px;
+            color: #2ecc71;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="profile">
+                <img src="https://i.postimg.cc/NLv2TWJq/IMG-20250528-220505.jpg" alt="Profile" class="profile-img">
+                <div class="profile-info">
+                    <h2>Multi Billionaire</h2>
+                    <p>Spending since 2025</p>
+                </div>
+            </div>
+            
+            <div class="wallet">
+                <div id="money-display">$1,000,000,000</div>
+                <div id="total-spent">Total Spent: $0</div>
+            </div>
+        </header>
+
+        <div class="categories">
+            <button class="category-btn active" data-category="luxury-cars"><i class="fas fa-car"></i> Cars</button>
+            <button class="category-btn" data-category="real-estate"><i class="fas fa-home"></i> Estate</button>
+            <button class="category-btn" data-category="extravagant"><i class="fas fa-crown"></i> Luxury</button>
+            <button class="category-btn" data-category="electronics"><i class="fas fa-mobile-alt"></i> Tech</button>
+            <button class="category-btn" data-category="misc"><i class="fas fa-star"></i> Misc</button>
+        </div>
+
+        <!-- Luxury Cars Category -->
+        <div id="luxury-cars" class="category-content active">
+            <div class="items-grid">
+                <!-- Lamborghini -->
+                <div class="item-card">
+                    <img src="https://i.postimg.cc/zfyNBXmP/IMG-20250528-220150.png" alt="Lamborghini" class="item-img">
+                    <div class="item-info">
+                        <h3 class="item-title">Lamborghini Aventador</h3>
+                        <div class="item-price">$520,000</div>
+                        <div class="item-controls">
+                            <div class="quantity-control">
+                                <button class="quantity-btn minus">-</button>
+                                <input type="number" class="quantity-input" value="1" min="1">
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                            <button class="buy-btn" data-price="520000" data-name="Lamborghini Aventador" data-image="https://i.postimg.cc/zfyNBXmP/IMG-20250528-220150.png">BUY</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Ferrari -->
+                <div class="item-card">
+                    <img src="https://i.postimg.cc/XJvV9cyx/IMG-20250528-220131.png" alt="Ferrari" class="item-img">
+                    <div class="item-info">
+                        <h3 class="item-title">Ferrari SF90 Stradale</h3>
+                        <div class="item-price">$625,000</div>
+                        <div class="item-controls">
+                            <div class="quantity-control">
+                                <button class="quantity-btn minus">-</button>
+                                <input type="number" class="quantity-input" value="1" min="1">
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                            <button class="buy-btn" data-price="625000" data-name="Ferrari SF90 Stradale" data-image="https://i.postimg.cc/XJvV9cyx/IMG-20250528-220131.png">BUY</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real Estate Category -->
+        <div id="real-estate" class="category-content">
+            <div class="items-grid">
+                <!-- Mansion -->
+                <div class="item-card">
+                    <img src="https://i.postimg.cc/t4sLjvGh/IMG-20250528-215949.png" alt="Mansion" class="item-img">
+                    <div class="item-info">
+                        <h3 class="item-title">Luxury Mansion</h3>
+                        <div class="item-price">$18,000,000</div>
+                        <div class="item-controls">
+                            <div class="quantity-control">
+                                <button class="quantity-btn minus">-</button>
+                                <input type="number" class="quantity-input" value="1" min="1">
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                            <button class="buy-btn" data-price="42000000" data-name="Luxury Mansion" data-image="https://i.postimg.cc/t4sLjvGh/IMG-20250528-215949.png">BUY</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Private Island -->
+                <div class="item-card">
+                    <img src="https://i.postimg.cc/jj71mWYK/IMG-20250528-220215.png" alt="Private Island" class="item-img">
+                    <div class="item-info">
+                        <h3 class="item-title">Private Island</h3>
+                        <div class="item-price">$10,000,000</div>
+                        <div class="item-controls">
+                            <div class="quantity-control">
+                                <button class="quantity-btn minus">-</button>
+                                <input type="number" class="quantity-input" value="1" min="1">
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                            <button class="buy-btn" data-price="10000000" data-name="Private Island" data-image="https://i.postimg.cc/jj71mWYK/IMG-20250528-220215.png">BUY</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 1000 Acre Land -->
+                <div class="item-card">
+                    <img src="https://i.postimg.cc/TPwjSB86/IMG-20250528-220008.png" alt="Land" class="item-img">
+                    <div class="item-info">
+                        <h3 class="item-title">1000 Acre Land</h3>
+                        <div class="item-price">$15,000,000</div>
+                        <div class="item-controls">
+                            <div class="quantity-control">
+                                <button class="quantity-btn minus">-</button>
+                                <input type="number" class="quantity-input" value="1" min="1">
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                            <button class="buy-btn" data-price="15000000" data-name="1000 Acre Land" data-image="https://i.postimg.cc/TPwjSB86/IMG-20250528-220008.png">BUY</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Extravagant Category -->
+        <div id="extravagant" class="category-content">
+            <div class="items-grid">
+                <!-- Private Jet -->
+                <div class="item-card">
+                    <img src="https://i.postimg.cc/XJNwFh8h/IMG-20250528-220233.png" alt="Private Jet" class="item-img">
+                    <div class="item-info">
+                        <h3 class="item-title">Private Jet</h3>
+                        <div class="item-price">$6,000,000</div>
+                        <div class="item-controls">
+                            <div class="quantity-control">
+                                <button class="quantity-btn minus">-</button>
+                                <input type="number" class="quantity-input" value="1" min="1">
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                            <button class="buy-btn" data-price="6000000" data-name="Private Jet" data-image="https://i.postimg.cc/XJNwFh8h/IMG-20250528-220233.png">BUY</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Helicopter -->
+                <div class="item-card">
+                    <img src="https://i.postimg.cc/pXKBngMW/IMG-20250528-220252.png" alt="Helicopter" class="item-img">
+                    <div class="item-info">
+                        <h3 class="item-title">Luxury Helicopter</h3>
+                        <div class="item-price">$5,000,000</div>
+                        <div class="item-controls">
+                            <div class="quantity-control">
+                                <button class="quantity-btn minus">-</button>
+                                <input type="number" class="quantity-input" value="1" min="1">
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                            <button class="buy-btn" data-price="5000000" data-name="Luxury Helicopter" data-image="https://i.postimg.cc/pXKBngMW/IMG-20250528-220252.png">BUY</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Moon -->
+                <div class="item-card">
+                    <img src="https://i.postimg.cc/0jQqJ8F4/IMG-20250528-220031.png" alt="Moon" class="item-img">
+                    <div class="item-info">
+                        <h3 class="item-title">The Moon</h3>
+                        <div class="item-price">$100,000,000</div>
+                        <div class="item-controls">
+                            <div class="quantity-control">
+                                <button class="quantity-btn minus">-</button>
+                                <input type="number" class="quantity-input" value="1" min="1">
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                            <button class="buy-btn" data-price="100000000" data-name="The Moon" data-image="https://i.postimg.cc/0jQqJ8F4/IMG-20250528-220031.png">BUY</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Russian Girl -->
+                <div class="item-card">
+                    <img src="https://i.postimg.cc/tgW6Lbr8/IMG-20250528-220114.png" alt="Russian Girl" class="item-img">
+                    <div class="item-info">
+                        <h3 class="item-title">Russian Supermodel</h3>
+                        <div class="item-price">$500,000</div>
+                        <div class="item-controls">
+                            <div class="quantity-control">
+                                <button class="quantity-btn minus">-</button>
+                                <input type="number" class="quantity-input" value="1" min="1">
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                            <button class="buy-btn" data-price="500000" data-name="Russian Supermodel" data-image="https://i.postimg.cc/tgW6Lbr8/IMG-20250528-220114.png">BUY</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Electronics Category -->
+        <div id="electronics" class="category-content">
+            <div class="items-grid">
+                <!-- Samsung -->
+                <div class="item-card">
+                    <img src="https://i.postimg.cc/HLzZ8F5c/IMG-20250528-220329.jpg" alt="Samsung" class="item-img">
+                    <div class="item-info">
+                        <h3 class="item-title">Samsung S25 Ultra</h3>
+                        <div class="item-price">$15,000</div>
+                        <div class="item-controls">
+                            <div class="quantity-control">
+                                <button class="quantity-btn minus">-</button>
+                                <input type="number" class="quantity-input" value="1" min="1">
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                            <button class="buy-btn" data-price="15000" data-name="Samsung S25 Ultra" data-image="https://i.postimg.cc/HLzZ8F5c/IMG-20250528-220329.jpg">BUY</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- iPhone -->
+                <div class="item-card">
+                    <img src="https://i.postimg.cc/wj7TrdxH/IMG-20250528-220310.jpg" alt="iPhone" class="item-img">
+                    <div class="item-info">
+                        <h3 class="item-title">iPhone Pro Max</h3>
+                        <div class="item-price">$25,000</div>
+                        <div class="item-controls">
+                            <div class="quantity-control">
+                                <button class="quantity-btn minus">-</button>
+<input type="number" class="quantity-input" value="1" min="1">
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                            <button class="buy-btn" data-price="25000" data-name="iPhone Pro Max" data-image="https://i.postimg.cc/wj7TrdxH/IMG-20250528-220310.jpg">BUY</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Misc Category -->
+        <div id="misc" class="category-content">
+            <div class="items-grid">
+                <!-- Hamburger -->
+                <div class="item-card">
+                    <img src="https://i.postimg.cc/GprVyLsj/IMG-20250528-220051.png" alt="Hamburger" class="item-img">
+                    <div class="item-info">
+                        <h3 class="item-title">Gourmet Hamburger</h3>
+                        <div class="item-price">$5</div>
+                        <div class="item-controls">
+                            <div class="quantity-control">
+                                <button class="quantity-btn minus">-</button>
+                                <input type="number" class="quantity-input" value="1" min="1">
+                                <button class="quantity-btn plus">+</button>
+                            </div>
+                            <button class="buy-btn" data-price="5" data-name="Gourmet Hamburger" data-image="https://i.postimg.cc/GprVyLsj/IMG-20250528-220051.png">BUY</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Purchase History -->
+        <div id="purchase-history">
+            <div class="history-header">
+                <h2><i class="fas fa-history"></i> Purchase History</h2>
+                <button id="clear-history">Clear</button>
+            </div>
+            <div class="history-list" id="history-list">
+                <div class="empty-history">
+                    <i class="fas fa-shopping-basket"></i>
+                    <h3>No purchases yet</h3>
+                    <p>Start shopping to see your history</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Billion Dollar Simulator</p>
+            <span class="gold-text">Balance: $<span id="current-balance">1,000,000,000</span></span>
+        </footer>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Game State
+        let money = 1000000000;
+        let totalSpent = 0;
+        let isAnimating = false;
+        let purchaseHistory = [];
+
+        // DOM Elements
+        const moneyDisplay = document.getElementById('money-display');
+        const totalSpentDisplay = document.getElementById('total-spent');
+        const currentBalance = document.getElementById('current-balance');
+        const notification = document.getElementById('notification');
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        const categoryContents = document.querySelectorAll('.category-content');
+        const historyList = document.getElementById('history-list');
+        const clearHistoryBtn = document.getElementById('clear-history');
+        
+        // Initialize
+        updateMoneyDisplay();
+
+        // Category Switching
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const category = btn.dataset.category;
+                
+                // Update active button
+                categoryBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                // Show corresponding content
+                categoryContents.forEach(content => content.classList.remove('active'));
+                document.getElementById(category).classList.add('active');
+            });
+        });
+
+        // Quantity Controls
+        document.addEventListener('click', function(e) {
+            // Minus buttons
+            if (e.target.classList.contains('minus')) {
+                const input = e.target.nextElementSibling;
+                if (input.value > 1) input.value--;
+            }
+            
+            // Plus buttons
+            if (e.target.classList.contains('plus')) {
+                const input = e.target.previousElementSibling;
+                input.value++;
+            }
+// Buy buttons
+            if (e.target.classList.contains('buy-btn')) {
+                if (isAnimating) return;
+                
+                const btn = e.target;
+                const price = parseInt(btn.dataset.price);
+                const quantity = parseInt(btn.parentElement.querySelector('.quantity-input').value);
+                const totalCost = price * quantity;
+                const itemName = btn.dataset.name;
+                const itemImage = btn.dataset.image;
+                
+                if (money >= totalCost) {
+                    isAnimating = true;
+                    
+                    // Button press effect
+                    btn.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        btn.style.transform = 'scale(1)';
+                    }, 200);
+
+                    // Create money deduction animation
+                    createMoneyChange(totalCost, btn);
+                    
+                    // Add to purchase history
+                    addToHistory(itemName, itemImage, quantity, totalCost);
+                    
+                    // Animate the money decreasing
+                    const startMoney = money;
+                    const endMoney = money - totalCost;
+                    const duration = 800; // 0.8 second
+                    const startTime = performance.now();
+
+                    function animateMoney(currentTime) {
+                        const elapsedTime = currentTime - startTime;
+                        const progress = Math.min(elapsedTime / duration, 1);
+                        money = Math.floor(startMoney - (totalCost * progress));
+                        updateMoneyDisplay();
+                        
+                        if (progress < 1) {
+                            requestAnimationFrame(animateMoney);
+                        } else {
+                            totalSpent += totalCost;
+                            totalSpentDisplay.textContent = `Total Spent: $${totalSpent.toLocaleString()}`;
+                            isAnimating = false;
+                            
+                            // Show notification
+                            showNotification(`Purchased ${quantity}x ${itemName} for $${totalCost.toLocaleString()}`);
+                            
+                            // Confetti effect for big purchases
+                            if (totalCost >= 1000000) {
+                                createConfetti(15);
+                            }
+                            
+                            // Special message if you buy the Moon
+                            if (price === 1000000000) {
+                                setTimeout(() => {
+                                    showNotification("🌕 Congratulations! You own the Moon!", 4000);
+                                }, 500);
+                            }
+                        }
+                    }
+
+                    requestAnimationFrame(animateMoney);
+                } else {
+                    showNotification("Not enough money! Try something cheaper.", 2500);
+                }
+            }
+        });
+
+        // Clear history button
+        clearHistoryBtn.addEventListener('click', () => {
+            purchaseHistory = [];
+            updateHistoryDisplay();
+        });
+
+        // Helper Functions
+        function updateMoneyDisplay() {
+            moneyDisplay.textContent = `$${money.toLocaleString()}`;
+            currentBalance.textContent = money.toLocaleString();
+        }
+
+        function createMoneyChange(amount, element) {
+            const rect = element.getBoundingClientRect();
+            const changeElement = document.createElement('div');
+            changeElement.className = 'money-change';
+            changeElement.textContent = `-$${amount.toLocaleString()}`;
+            changeElement.style.left = `${rect.left + rect.width/2}px`;
+            changeElement.style.top = `${rect.top}px`;
+            document.body.appendChild(changeElement);
+            
+            setTimeout(() => {
+                changeElement.remove();
+            }, 1300);
+        }
+
+        function createConfetti(count = 15) {
+            for (let i = 0; i < count; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 60%)`;
+                confetti.style.animationDuration = `${Math.random() * 2 + 2}s`;
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => {
+                    confetti.remove();
+                }, 1800);
+            }
+        }
+
+        function showNotification(message, duration = 2500) {
+            notification.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, duration);
+        }
+        
+        // Purchase History Functions
+        function addToHistory(name, image, quantity, totalCost) {
+            const timestamp = new Date();
+            const historyItem = {
+                name,
+                image,
+                quantity,
+                totalCost,
+                timestamp
+            };
+            
+            purchaseHistory.unshift(historyItem);
+            updateHistoryDisplay();
+        }
+        
+        function updateHistoryDisplay() {
+            if (purchaseHistory.length === 0) {
+                historyList.innerHTML = `
+                    <div class="empty-history">
+                        <i class="fas fa-shopping-basket"></i>
+                        <h3>No purchases yet</h3>
+                        <p>Start shopping to see your history</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            historyList.innerHTML = '';
+            
+            purchaseHistory.forEach(item => {
+                const formattedDate = item.timestamp.toLocaleDateString();
+                
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}">
+                    <div class="history-details">
+                        <h3>${item.name}</h3>
+                        <div class="history-meta">
+                            <span>Qty: ${item.quantity}</span>
+                            <span>${formattedDate}</span>
+                        </div>
+                    </div>
+                    <div class="history-cost">-$${item.totalCost.toLocaleString()}</div>
+                `;
+                
+                historyList.appendChild(historyItem);
+            });
+        }
+    </script>
+</body>
+</html>
